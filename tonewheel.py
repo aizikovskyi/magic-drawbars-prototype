@@ -25,3 +25,47 @@ class Tonewheel:
         for volList in self.drawbarVolumes:
             volList.reverse()
         # Now self.drawbarVolumes[0][0] corresponds to drawbar 1, setting 1.
+    
+    def approximateChromaticSpectrumAtNote(self, spectrum, note):
+        """Will normalize the output so that the "loudest" drawbar is at max setting"""
+        spectrumVolumes = [spectrum.value(note + offset) for offset in self.drawbarOffsets]
+        excessVolumes = [spectrumVolumes[x] - self.drawbarVolumes[x][-1] for x in range(self.numDrawbars)]
+        largestExcess = max(excessVolumes)
+        spectrumVolumes = [vol - largestExcess for vol in spectrumVolumes]
+        drawbarSettings = []
+        for i in range(self.numDrawbars):
+            vol = spectrumVolumes[i]
+            # Find the closest drawbar setting to this volume. How do we decide between settings 1 and 0?
+            # For now, let's hardcode a 6dB threshhold (below the min drawbar volume)
+            if vol < self.drawbarVolumes[i][0]:
+                if (self.drawbarVolumes[i][0] - vol < 6):
+                    drawbarSettings.append(1)
+                else:
+                    drawbarSettings.append(0)
+                continue
+            lower = 0
+            for setting in range(1, self.numSettings):
+                drawbarVol = self.drawbarVolumes[i][setting]
+                if drawbarVol < vol:
+                    lower = setting
+                else:
+                    upper = setting
+                    lowerDiff = vol - self.drawbarVolumes[i][lower]
+                    upperDiff = self.drawbarVolumes[i][upper] - vol
+                    if lowerDiff < upperDiff:
+                        drawbarSettings.append(lower + 1)
+                    else:
+                        drawbarSettings.append(upper + 1)
+                    break
+        return TonewheelSettings(self, drawbarSettings)
+
+
+
+
+class TonewheelSettings:
+    def __init__(self, tonewheel, drawbarValues):
+        """DrawbarValues is indexed from 1 relative to Tonewheel. Drawbar value 0 is -inf"""
+        self.tonewheel = tonewheel
+        self.drawbarValues = drawbarValues
+    def __str__(self):
+        return ''.join([x and str(x) or '.' for x in self.drawbarValues])
