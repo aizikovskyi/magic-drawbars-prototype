@@ -1,6 +1,8 @@
 # Parameters for a tonewheel engine. Currently hardcoded
 # using imprecise data from my stage keyboard.
 # Support for different models will be straightforward to add when required.
+# This data is VERY inaccurate; but at the same time, having only 8 discrete settings
+# per drawbar means that we can get away with low accuracy.
 
 class Tonewheel:
     def __init__(self):
@@ -18,6 +20,7 @@ class Tonewheel:
             [-6.7, -8.5, -10.0, -11.7, -14.1, -16.5, -19.1, -21.9],
             [-9.6, -11.1, -12.7, -14.3, -16.7, -19.0, -21.6, -24.0]
         ]
+        self.highestVolume = -0.33
         # These were listed backwards, so reverse them...
         for volList in self.drawbarVolumes:
             volList.reverse()
