@@ -36,9 +36,10 @@ class Tonewheel:
         for i in range(self.numDrawbars):
             vol = spectrumVolumes[i]
             # Find the closest drawbar setting to this volume. How do we decide between settings 1 and 0?
-            # For now, let's hardcode a 6dB threshhold (below the min drawbar volume)
+            # For now, let's hardcode a 4dB threshhold (below the min drawbar volume)
             if vol < self.drawbarVolumes[i][0]:
-                if (self.drawbarVolumes[i][0] - vol < 6):
+                # print "vol (%f) below min volume (%f)" % (vol, self.drawbarVolumes[i][0])
+                if (self.drawbarVolumes[i][0] - vol < 4):
                     drawbarSettings.append(1)
                 else:
                     drawbarSettings.append(0)
@@ -46,7 +47,7 @@ class Tonewheel:
             lower = 0
             for setting in range(1, self.numSettings):
                 drawbarVol = self.drawbarVolumes[i][setting]
-                if drawbarVol < vol:
+                if drawbarVol < vol and setting != self.numSettings - 1:
                     lower = setting
                 else:
                     upper = setting
