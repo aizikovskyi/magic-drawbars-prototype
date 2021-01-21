@@ -4,6 +4,8 @@
 # This data is VERY inaccurate; but at the same time, having only 8 discrete settings
 # per drawbar means that we can get away with low accuracy.
 
+import acoustic_utils
+
 class Tonewheel:
     def __init__(self):
         self.numDrawbars = 9
@@ -59,6 +61,9 @@ class Tonewheel:
                         drawbarSettings.append(upper + 1)
                     break
         return TonewheelSettings(self, drawbarSettings)
+
+    def frequenciesAtNote(self, note):
+        return [acoustic_utils.noteToFrequency(note+offset) for offset in self.drawbarOffsets]
 
 
 
